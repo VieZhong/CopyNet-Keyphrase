@@ -205,7 +205,7 @@ def add_arguments(parser):
                       help="Dropout rate (not keep_prob)")
   parser.add_argument("--max_gradient_norm", type=float, default=5.0,
                       help="Clip gradients to this norm.")
-  parser.add_argument("--batch_size", type=int, default=128, help="Batch size.")
+  parser.add_argument("--batch_size", type=int, default=32, help="Batch size.")
 
   parser.add_argument("--steps_per_stats", type=int, default=100,
                       help=("How many training steps to do per stats logging."

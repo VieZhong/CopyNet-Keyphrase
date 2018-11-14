@@ -48,7 +48,7 @@ class CopyNetWrapper(tf.nn.rnn_cell.RNNCell):
 
         self._initial_cell_state = initial_cell_state
         self._copy_weight = tf.get_variable('CopyWeight', [self._encoder_state_size , self._cell.output_size])
-        self._frequence_weight = tf.get_variable('FrequenceWeight', initializer=tf.constant_initializer(1 / self._encoder_input_ids.shape[-1].value))
+#         self._frequence_weight = tf.get_variable('FrequenceWeight', [1], initializer=tf.random_normal_initializer(1 / tf.shape(self._encoder_input_ids)[-1], 0.01, dtype=tf.float32), dtype=tf.float32)
 
         self._projection = tf.layers.Dense(self._gen_vocab_size, use_bias=False, name="OutputProjection")
 
@@ -84,7 +84,8 @@ class CopyNetWrapper(tf.nn.rnn_cell.RNNCell):
 #        prob_g = probs[:, :self._gen_vocab_size]
 #        prob_c = probs[:, self._gen_vocab_size:]
 
-        prob_frequence = tf.reduce_sum(encoder_input_mask, 1) * self._frequence_weight
+        prob_frequence = tf.div(tf.reduce_sum(encoder_input_mask, 1), tf.cast(tf.shape(self._encoder_input_ids)[-1], tf.float32))
+#         prob_frequence = tf.reduce_sum(encoder_input_mask, 1) * self._frequence_weight
 
         prob_c_one_hot = tf.einsum("ijn,ij->in", encoder_input_mask, prob_c)
         prob_g_total = tf.pad(prob_g, [[0, 0], [0, self._vocab_size - self._gen_vocab_size]])
