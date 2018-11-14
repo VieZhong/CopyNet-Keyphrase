@@ -27,7 +27,7 @@ class CopyNetWrapper(tf.nn.rnn_cell.RNNCell):
         Args:
             cell:
             encoder_states:
-            encoder_input_ids:
+            encoder_input_ids: 源文件对应词的 id 列表  （batch_size, max_src_length）
             tgt_vocab_size:
             gen_vocab_size:
             encoder_state_size:
@@ -48,6 +48,8 @@ class CopyNetWrapper(tf.nn.rnn_cell.RNNCell):
 
         self._initial_cell_state = initial_cell_state
         self._copy_weight = tf.get_variable('CopyWeight', [self._encoder_state_size , self._cell.output_size])
+        self._frequence_weight = tf.get_variable('FrequenceWeight', initializer=tf.constant_initializer(1 / self._encoder_input_ids.shape[-1].value))
+
         self._projection = tf.layers.Dense(self._gen_vocab_size, use_bias=False, name="OutputProjection")
 
     def __call__(self, inputs, state, scope=None):
@@ -82,9 +84,11 @@ class CopyNetWrapper(tf.nn.rnn_cell.RNNCell):
 #        prob_g = probs[:, :self._gen_vocab_size]
 #        prob_c = probs[:, self._gen_vocab_size:]
 
+        prob_frequence = tf.reduce_sum(encoder_input_mask, 1) * self._frequence_weight
+
         prob_c_one_hot = tf.einsum("ijn,ij->in", encoder_input_mask, prob_c)
         prob_g_total = tf.pad(prob_g, [[0, 0], [0, self._vocab_size - self._gen_vocab_size]])
-        outputs = prob_c_one_hot + prob_g_total
+        outputs = prob_c_one_hot + prob_g_total + prob_frequence # the shape is (batch_size, vocab_size)
         last_ids = tf.argmax(outputs, axis=-1, output_type=tf.int32)
         #prob_c.set_shape([None, self._encoder_state_size])
         state = CopyNetWrapperState(cell_state=cell_state, last_ids=last_ids, prob_c=prob_c)

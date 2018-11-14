@@ -146,10 +146,10 @@ def add_arguments(parser):
                             "between [-this, this]."))
 
   # data
-  parser.add_argument("--src", type=str, default=None,
-                      help="Source suffix, e.g., en.")
-  parser.add_argument("--tgt", type=str, default=None,
-                      help="Target suffix, e.g., de.")
+  parser.add_argument("--src", type=str, default="txt",
+                      help="Source suffix, e.g., txt.")
+  parser.add_argument("--tgt", type=str, default="key",
+                      help="Target suffix, e.g., key.")
   parser.add_argument("--train_prefix", type=str, default=None,
                       help="Train prefix, expect files with src/tgt suffixes.")
   parser.add_argument("--dev_prefix", type=str, default=None,
