@@ -217,6 +217,9 @@ def create_infer_model(model_creator, hparams, scope=None, extra_args=None):
 
 def _get_embed_device(vocab_size):
   """Decide on which device to place an embed matrix given its vocab size."""
+  print("\n\n\n\n\n\n\n\n")
+  print("vocab_size: %s" % vocab_size)
+  print("\n\n\n\n\n\n\n\n")
   if vocab_size > VOCAB_SIZE_THRESHOLD_CPU:
     return "/cpu:0"
   else:
