@@ -14,6 +14,9 @@ python -m nmt.nmt \
 	--copynet \
 	--share_vocab \
 	--attention=normed_bahdanau \
-	--gen_vocab_size=2000 \
+	--gen_vocab_size=10000 \
 	--src_max_len=420 \
-	--infer_batch_size=8
+	--infer_batch_size=8 \
+	--num_gpus=4 \
+	--src_max_len_infer=420 \
+	--tgt_max_len_infer=40
