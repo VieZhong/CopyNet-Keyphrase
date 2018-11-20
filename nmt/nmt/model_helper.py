@@ -217,9 +217,6 @@ def create_infer_model(model_creator, hparams, scope=None, extra_args=None):
 
 def _get_embed_device(vocab_size):
   """Decide on which device to place an embed matrix given its vocab size."""
-  print("\n\n\n\n\n\n\n\n")
-  print("vocab_size: %s" % vocab_size)
-  print("\n\n\n\n\n\n\n\n")
   if vocab_size > VOCAB_SIZE_THRESHOLD_CPU:
     return "/cpu:0"
   else:
@@ -247,16 +244,34 @@ def _create_pretrained_emb_from_txt(
     utils.print_out("    %s" % token)
     if token not in emb_dict:
       emb_dict[token] = [0.0] * emb_size
+  
+  emb_mat = []
+  unk_dict = dict()
+  i = 0
+  for token in vocab:
+    if token not in emb_dict:
+      emb_dict[token] = [0.0] * emb_size
+      if token not in unk_dict:
+        unk_dict[token] = [i]
+      else:
+        unk_dict[token].append[i]
+    emb_mat.append(emb_dict[token])
+    i = i + 1
 
-  emb_mat = np.array(
-      [emb_dict[token] for token in vocab], dtype=dtype.as_numpy_dtype())
+
+  emb_mat = np.array(emb_mat, dtype=dtype.as_numpy_dtype())
   emb_mat = tf.constant(emb_mat)
   emb_mat_const = tf.slice(emb_mat, [num_trainable_tokens, 0], [-1, -1])
   with tf.variable_scope(scope or "pretrain_embeddings", dtype=dtype) as scope:
     with tf.device(_get_embed_device(num_trainable_tokens)):
       emb_mat_var = tf.get_variable(
           "emb_mat_var", [num_trainable_tokens, emb_size])
-  return tf.concat([emb_mat_var, emb_mat_const], 0)
+  emb_mat_const = tf.concat([emb_mat_var, emb_mat_const], 0)
+
+  for unk_word_token in unk_dict:
+    for index in unk_dict[unk_word_token]:
+      emb_mat_const = tf.concat([tf.slice(emb_mat_const, [0, 0], [index, -1]), tf.slice(emb_mat_var, [0, 0], [1, -1]), tf.slice(emb_mat_const, [index + 1, 0], [-1, -1])], 0) 
+  return emb_mat_const
 
 
 def _create_or_load_embed(embed_name, vocab_file, embed_file,

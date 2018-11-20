@@ -1,0 +1,2 @@
+nohup: ignoring input
+nohup: failed to run command 'PYTHONIOENCODING=utf-8:surrogateescape': No such file or directory

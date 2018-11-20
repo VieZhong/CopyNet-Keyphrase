@@ -1,22 +1,23 @@
 mkdir /tmp/keyphrase_model 
 python -m nmt.nmt \
-	--batch_size=16 \
+	--batch_size=4 \
 	--vocab_prefix=/project/data/test_for_keyphrase/voc \
 	--train_prefix=/project/data/test_for_keyphrase/train \
 	--dev_prefix=/project/data/test_for_keyphrase/validation \
 	--test_prefix=/project/data/test_for_keyphrase/test \
+	--embed_prefix=/project/data/test_for_keyphrase/embedding \
 	--out_dir=/tmp/keyphrase_model \
-	--num_train_steps=12000 \
+	--num_train_steps=10000 \
 	--steps_per_stats=100 \
 	--num_layers=2 \
-	--num_units=300 \
+	--num_units=200 \
 	--dropout=0.2 \
-	--copynet \
-	--share_vocab \
-	--attention=normed_bahdanau \
-	--gen_vocab_size=10000 \
-	--src_max_len=420 \
-	--infer_batch_size=8 \
-	--num_gpus=4 \
-	--src_max_len_infer=420 \
-	--tgt_max_len_infer=40
+	--src_max_len=400 \
+	--tgt_max_len=50 \
+	--infer_batch_size=2 \
+	--num_gpus=1 \
+	--src_max_len_infer=400 \
+	--tgt_max_len_infer=50 \
+	--encoder_type=bi \
+	--unit_type=gru \
+	--share_vocab
